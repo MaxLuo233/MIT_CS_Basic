@@ -337,7 +337,8 @@ class Transition:
         return id
 
 class PriorityQueue:
-    """Heap-based priority queue implementation."""
+    """新修改的类
+    Heap-based priority queue implementation."""
     
     def __init__(self):
         """Initially empty priority queue."""
