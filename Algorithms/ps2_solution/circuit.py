@@ -337,8 +337,7 @@ class Transition:
         return id
 
 class PriorityQueue:
-    """新修改的类
-    Heap-based priority queue implementation."""
+    """新修改的类，从线性优先队列改到堆优先队列."""
     
     def __init__(self):
         """Initially empty priority queue."""
@@ -349,7 +348,7 @@ class PriorityQueue:
         return len(self.heap) - 1
     
     def append(self, key):
-        """Inserts an element in the priority queue."""
+        """插入."""
         if key is None:
             raise ValueError('Cannot insert None in the queue')
     
@@ -364,15 +363,11 @@ class PriorityQueue:
                 break
     
     def min(self):
-        """Returns the smallest element in the queue."""
+        """拿出堆头."""
         return self.heap[1]
     
-    def pop(self):
-        """Removes the minimum element in the queue.
-    
-        Returns:
-            The value of the removed element.
-        """
+    def pop(self)->str:
+        """弹出最小值."""
         heap = self.heap
         popped_key = heap[1]
         if len(heap) == 2:
