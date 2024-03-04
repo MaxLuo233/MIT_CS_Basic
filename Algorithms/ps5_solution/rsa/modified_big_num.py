@@ -1,5 +1,3 @@
-'''Large number arithmetic optimized for KS cores.'''
-
 from __future__ import division  # Use // for integer division.
 import os     # Used for os.environ.
 import sys    # Used to smooth over the range / xrange issue.
@@ -414,16 +412,16 @@ class BigNum(object):
     '''False if the number has at least one trailing 0 (zero) digit.'''
     return len(self.d) == 1 or self.d[-1] != Byte.zero()
 
-  ### SOLUTION BLOCK
+  ###
   
   def slow_mul(self, other):
     '''
     Slow method for multiplying two numbers w/ good constant factors.
     '''
     result = BigNum.zero(len(self.d) + len(other.d))
-    for i in xrange(0, len(self.d)):
+    for i in range(0, len(self.d)):
       carry = Byte.zero()
-      for j in xrange(0, len(other.d)):
+      for j in range(0, len(other.d)):
         word = self.d[i] * other.d[j] + result.d[i + j].word() + carry.word()
         result.d[i + j] = word.lsb()
         carry = word.msb()
@@ -441,11 +439,11 @@ class BigNum(object):
       divisors.append((divisors[-1] + divisors[-1]).normalize())
     
     quotient = BigNum.zero()
-    for i in xrange(len(divisors) - 1, -1, -1):
+    for i in range(len(divisors) - 1, -1, -1):
       quotient = (quotient + quotient).normalize()
       if remainder >= divisors[i]:
         remainder = (remainder - divisors[i]).normalize()
         quotient.d[0] |= Byte.one()
     return (quotient.normalize(), remainder)    
   
-  ### END SOLUTION BLOCK
+  ###
