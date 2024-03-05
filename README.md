@@ -15,7 +15,7 @@ Homework and Labs of MIT CS Basic Courses
 基本数据结构操作，算法原理和分析，P和NP问题简介；Problem Set * 7
 
 ## 6.009 
-递归与迭，一致性原则，面向对象编程：Lab * 6
+递归与迭代，一致性原则，面向对象编程：Lab * 6
 
 ## 6.031 
 
