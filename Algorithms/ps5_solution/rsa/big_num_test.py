@@ -6,7 +6,7 @@ import os
 if os.environ.get('SOLUTION'):
   from big_num_full import *
 else:
-  from big_num import *
+  from modified_big_num import * ###
 
 class BigNumTest(unittest.TestCase):
   def test_equality(self):

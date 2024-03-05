@@ -1,9 +1,6 @@
 from __future__ import division  # Use // for integer division.
 import os     # Used for os.environ.
-import sys    # Used to smooth over the range / xrange issue.
-# Python 3 doesn't have xrange, and range behaves like xrange.
-if sys.version_info >= (3,):
-    xrange = range
+import sys    # Used to smooth over the range / range issue.
 
 if os.environ.get('KS_DEBUG') and os.environ.get('KS_DEBUG') != 'false':
   from ks_primitives import *
@@ -61,7 +58,7 @@ class BigNum(object):
                   allowed digits are 0-9, A-F, a-f
     '''
     digits = []
-    for i in xrange(len(hex_string), 0, -2):
+    for i in range(len(hex_string), 0, -2):
       if i == 1:
         byte_string = '0' + hex_string[0]
       else:
@@ -83,7 +80,7 @@ class BigNum(object):
     start = len(self.d) - 1
     while start > 0 and self.d[start] == Byte.zero():
       start -= 1
-    return ''.join([self.d[i].hex() for i in xrange(start, -1, -1)])
+    return ''.join([self.d[i].hex() for i in range(start, -1, -1)])
   
   def __eq__(self, other):
     '''== for BigNums.
@@ -119,7 +116,7 @@ class BigNum(object):
     if len(self.d) != len(other.d):
       return len(self.d) < len(other.d)
     
-    for i in xrange(len(self.d) - 1, -1, -1):
+    for i in range(len(self.d) - 1, -1, -1):
       if self.d[i] != other.d[i]:
         return self.d[i] < other.d[i]
     return False
@@ -137,7 +134,7 @@ class BigNum(object):
     if len(self.d) != len(other.d):
       return len(self.d) < len(other.d)
     
-    for i in xrange(len(self.d) - 1, -1, -1):
+    for i in range(len(self.d) - 1, -1, -1):
       if self.d[i] != other.d[i]:
         return self.d[i] < other.d[i]
     return True
@@ -195,7 +192,7 @@ class BigNum(object):
         
     result = BigNum.zero(1 + max(len(self.d), len(other.d)))
     carry = Byte.zero()
-    for i in xrange(0, len(result.d)):
+    for i in range(0, len(result.d)):
       if i < len(self.d):
         a = self.d[i] + carry
       else:
@@ -221,7 +218,7 @@ class BigNum(object):
       return NotImplemented  # BigNums can only be subtracted from BigNums.    
     result = BigNum.zero(max(len(self.d), len(other.d)))
     carry = Byte.zero()
-    for i in xrange(0, len(result.d)):
+    for i in range(0, len(result.d)):
       if i < len(self.d):
         a = self.d[i].word()
       else:
@@ -250,15 +247,23 @@ class BigNum(object):
       return self.slow_mul(other)
     return self.fast_mul(other)
 
-  def slow_mul(self, other):
+  def slow_mul(self, other): ###
     '''
-    Slow method for multiplying two numbers w/ good constant factors.
+    慢速乘法
     '''
-    return self.fast_mul(other)
+    result = BigNum.zero(len(self.d) + len(other.d))
+    for i in range(0, len(self.d)):
+      carry = Byte.zero()
+      for j in range(0, len(other.d)):
+        word = self.d[i] * other.d[j] + result.d[i + j].word() + carry.word()
+        result.d[i + j] = word.lsb()
+        carry = word.msb()
+      result.d[i + len(other.d)] = carry
+    return result.normalize()
 
   def fast_mul(self, other):
     '''
-    Asymptotically fast method for multiplying two numbers.
+    Karatsuba算法，快速乘法，O(n^2)-->O(n^log2(3))
     '''
     in_digits = max(len(self.d), len(other.d))
     if in_digits == 1:
@@ -309,15 +314,27 @@ class BigNum(object):
       return self.slow_divmod(other)
     return self.fast_divmod(other)
   
-  def slow_divmod(self, other):
+  def slow_divmod(self, other): ###
     '''
-    Slow method for dividing two numbers w/ good constant factors.
+    慢速除法
     '''
-    return self.fast_divmod(other)
+    remainder = BigNum(self.d)
+    divisors = [BigNum(other.d)]
+    two = BigNum.one() + BigNum.one()
+    while divisors[-1] < remainder:
+      divisors.append((divisors[-1] + divisors[-1]).normalize())
+    
+    quotient = BigNum.zero()
+    for i in range(len(divisors) - 1, -1, -1):
+      quotient = (quotient + quotient).normalize()
+      if remainder >= divisors[i]:
+        remainder = (remainder - divisors[i]).normalize()
+        quotient.d[0] |= Byte.one()
+    return (quotient.normalize(), remainder)
 
   def fast_divmod(self, other):
     '''
-    Asymptotically fast method for dividing two numbers.
+    Newton算法，快速除法，O(n^2)-->O(n^log2(3))
     '''
     # Special-case 1 so we don't have to deal with its inverse.
     if len(other.d) == 1 and other.d[0] == Byte.one():
@@ -382,9 +399,9 @@ class BigNum(object):
     exp = BigNum(exponent.d)
     exp.normalize()
     two = (Byte.one() + Byte.one()).lsb()
-    for i in xrange(len(exp.d)):
+    for i in range(len(exp.d)):
       mask = Byte.one()
-      for j in xrange(0, 8):
+      for j in range(0, 8):
         if (exp.d[i] & mask) != Byte.zero():
           result = (result * multiplier) % modulus
         mask = (mask * two).lsb()
@@ -412,38 +429,3 @@ class BigNum(object):
     '''False if the number has at least one trailing 0 (zero) digit.'''
     return len(self.d) == 1 or self.d[-1] != Byte.zero()
 
-  ###
-  
-  def slow_mul(self, other):
-    '''
-    Slow method for multiplying two numbers w/ good constant factors.
-    '''
-    result = BigNum.zero(len(self.d) + len(other.d))
-    for i in range(0, len(self.d)):
-      carry = Byte.zero()
-      for j in range(0, len(other.d)):
-        word = self.d[i] * other.d[j] + result.d[i + j].word() + carry.word()
-        result.d[i + j] = word.lsb()
-        carry = word.msb()
-      result.d[i + len(other.d)] = carry
-    return result.normalize()
-
-  def slow_divmod(self, other):
-    '''
-    Slow method for dividing two numbers w/ good constant factors.
-    '''
-    remainder = BigNum(self.d)
-    divisors = [BigNum(other.d)]
-    two = BigNum.one() + BigNum.one()
-    while divisors[-1] < remainder:
-      divisors.append((divisors[-1] + divisors[-1]).normalize())
-    
-    quotient = BigNum.zero()
-    for i in range(len(divisors) - 1, -1, -1):
-      quotient = (quotient + quotient).normalize()
-      if remainder >= divisors[i]:
-        remainder = (remainder - divisors[i]).normalize()
-        quotient.d[0] |= Byte.one()
-    return (quotient.normalize(), remainder)    
-  
-  ###

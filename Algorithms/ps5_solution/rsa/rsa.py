@@ -2,15 +2,8 @@ from __future__ import division  # Use // for integer division.
 import json   # Used when TRACE=jsonp
 import os     # Used to get the TRACE environment variable
 import sys
-# Python 3 doesn't have xrange, and range behaves like xrange.
-if sys.version_info >= (3,):
-    xrange = range
 
-if os.environ.get('SOLUTION'):
-  from big_num_full import *
-else:
-  from big_num import *
-
+from modified_big_num import *
 
 class RsaKey(object):
   '''Public or private RSA key.'''
