@@ -1,9 +1,9 @@
 ### 仿真电路项目升级，检查数字电路图的布线是否缠绕，要求改进circuit2.py中sweep-line算法，使得校验电线布控的时间开销显著降低。
 
 ### 文件目录：
-  *modified_circuit2.py - 主程序，包含修改过的CrossVerifier类，RangeIndex类通过线路端点坐标检验判断布线是否交差，运用sweep-line算法消除缠线
-  *tests/* - 测试样例，来自官网
-  *circuit2/* - 题目源文件，包含没修改过的circuit2.py
+  * modified_circuit2.py - 主程序，包含修改过的CrossVerifier类，RangeIndex类通过线路端点坐标检验判断布线是否交差，运用sweep-line算法消除缠线
+  * tests/* - 测试样例，来自官网
+  * circuit2/* - 题目源文件，包含没修改过的circuit2.py
 
 ### 使用方法:
   python modified_circuit2.py < tests/{case}.in > out

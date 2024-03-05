@@ -1,11 +1,11 @@
 ### 解决某芯片的RSA计算效率问题，关键在于提高乘法和除法的效率，目的在于以空间换时间处理大数计算问题。
 
 ### 文件目录：
-  *rsa/* 主文件
-  *rsa/modified_big_num.py 作业程序，修改大数乘法和除法逻辑
-  *rsa/big_num_test.py 提供sanity test
-  *rsa/rsa.py 主程序
-  *rsa/tests 测试样例
+  * rsa/* 主文件
+  * rsa/modified_big_num.py 作业程序，修改大数乘法和除法逻辑
+  * rsa/big_num_test.py 提供sanity test
+  * rsa/rsa.py 主程序
+  * rsa/tests 测试样例
 
 ### 使用方法:
   python rsa.py < tests/{case}.in > out

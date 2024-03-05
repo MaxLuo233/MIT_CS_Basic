@@ -2,9 +2,9 @@
 #
 
 ### 文件目录：
-  *final_dnaseq.py - 实例化源文件dnaseq.py中的接口
-  *dist/data* - 测试样例，来自官网
-  *dnaseqlib.py* - 题目源文件，包含依赖，其中规定了Hash方法
+  * final_dnaseq.py - 实例化源文件dnaseq.py中的接口
+  * dist/data/* - 测试样例，来自官网
+  * dnaseqlib.py - 题目源文件，包含依赖，其中规定了Hash方法
 
 ### 使用方法:
   python final_dnaseq.py
