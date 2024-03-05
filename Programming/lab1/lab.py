@@ -16,33 +16,73 @@ class Image:
         self.height = height
         self.pixels = pixels
 
-    def get_pixel(self, x, y):
-        return self.pixels[x, y]
+    def get_pixel(self, pixel):
+        return self.pixels[pixel]
+    
+    def getPixelCorrelate(self,x,y):
+        """
+        takes an image and the x and y values of a pixel,
+        returns the value (color) of that pixel
+        """
+        a,b=x,y
+        if x<0:
+            a=0
+        elif x>=self.width:
+            a=self.width-1
+        if y<0:
+            b=0
+        elif y>=self.height:
+            b=self.height-1
+        return self.pixels[self.width*b+a]
 
-    def set_pixel(self, x, y, c):
-        self.pixels[x, y] = c
+    def set_pixel(self, pixel, newcolor):
+        self.pixels[pixel] = newcolor
 
     def apply_per_pixel(self, func):
-        result = Image.new(self.height, self.width)
+        result = Image.new(self.width, self.height)
         for x in range(result.width):
             for y in range(result.height):
-                color = self.get_pixel(x, y)
+                pixel = self.width*y+x
+                color = self.get_pixel(pixel)
                 newcolor = func(color)
-            result.set_pixel(y, x, newcolor)
+                result.set_pixel(pixel, newcolor)
         return result
 
     def inverted(self):
-        return self.apply_per_pixel(lambda c: 256-c)
+        return self.apply_per_pixel(lambda c: 255-c)
 
     def blurred(self, n):
-        raise NotImplementedError
+        kern = []
+        for k in range(n):
+            kern.append([1/(n**2) for x in range(n)])
+        return clip(correlate(self,kern))
 
     def sharpened(self, n):
-        raise NotImplementedError
+        blur = self.blurred(n)
+        double = self.apply_per_pixel(lambda c: 2*c)
+        result = Image.new(self.width,self.height)
+        i=0
+        for y in range(self.height):
+            for x in range(self.width):
+                dub = double.getPixelCorrelate(x,y)
+                bl = blur.getPixelCorrelate(x,y)
+                result.set_pixel(i,dub-bl)
+                i+=1
+        return clip(result)
 
     def edges(self):
-        raise NotImplementedError
-
+        kx,ky = [[-1,0,1],[-2,0,2],[-1,0,1]],[[-1,-2,-1],[0,0,0],[1,2,1]]
+        result = Image.new(self.width,self.height)
+        resultx,resulty = correlate(self,kx),correlate(self,ky)
+        i=0
+        for y in range(self.height):
+            for x in range(self.width):
+                pixX = resultx.getPixelCorrelate(x,y)
+                pixY = resulty.getPixelCorrelate(x,y)
+                result.set_pixel(i,round(math.sqrt(pixX**2+pixY**2)))
+                i+=1
+        return clip(result)
+        
 
     # Below this point are utilities for loading, saving, and displaying
     # images, as well as for testing.
@@ -156,6 +196,46 @@ class Image:
         # when the window is closed, the program should stop
         toplevel.protocol('WM_DELETE_WINDOW', tk_root.destroy)
 
+def correlate(img, kern):
+    """
+    applies an abitrary kernel to an arbitrary image; returns a new image
+    img: an image object
+    kern: 2D array (list of lists) representing the kernel
+    """
+    result = Image.new(img.width,img.height)
+    
+    #create a 1D version of the kernel
+    Dkern = []
+    for i in range(len(kern)):
+        for pix in kern[i]:
+            Dkern.append(pix)
+            
+    for y in range(img.height):
+        for x in range(img.width):
+            patch = Image.new(len(kern),len(kern[0]))
+            index = 0
+            for b in range(len(kern)):
+                for a in range(len(kern[0])):
+                    patch.set_pixel(index, img.getPixelCorrelate(x-(len(kern)//2)+a,\
+                                                         y-(len(kern[0])//2)+b))
+                    index += 1
+            newcolor = 0
+            for pix in range(len(patch.pixels)):
+                newcolor += patch.pixels[pix]*Dkern[pix]
+            result.set_pixel(img.width*y+x,newcolor)
+    return result
+
+def clip(img):
+    """
+    clips invalid pixel values
+    """
+    for i,p in enumerate(img.pixels):
+        img.set_pixel(i,int(round(p)))
+        if p<0:
+            img.set_pixel(i,0)
+        elif p>255:
+            img.set_pixel(i,255)
+    return img
 
 try:
     tk_root = tkinter.Tk()
@@ -172,7 +252,28 @@ if __name__ == '__main__':
     # code in this block will only be run when you explicitly run your script,
     # and not when the tests are being run.  this is a good place for
     # generating images, etc.
-    pass
+    
+#    im = Image.load('test_images/bluegill.png')
+#    imInverted = im.inverted()
+#    imInverted.save('bluegill_inverted.png')
+    
+#    kernel = [[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[1,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]]
+#    im = Image.load('test_images/pigbird.png')
+#    imKernel = clip(correlate(img,kernel))
+#    imKernel.save('pigbird_correlate.png')
+    
+#    im = Image.load('test_images/cat.png')
+#    imBlurred = im.blurred(5)
+#    imBlurred.save('cat_blurred.png')
+    
+#    im = Image.load('test_images/python.png')
+#    imSharpen = im.sharpened(11)
+#    imSharpen.save('python_sharped.png')
+
+    im = Image.load('test_images/construct.png')
+    imEdges = im.edges()
+    imEdges.save('construct_edges.png')
+
 
     # the following code will cause windows from Image.show to be displayed
     # properly, whether we're running interactively or not:
