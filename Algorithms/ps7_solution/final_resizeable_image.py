@@ -3,7 +3,7 @@ import imagematrix
 
 class ResizeableImage(imagematrix.ImageMatrix):
     def best_seam(self):
-        # Calculate each energy once.
+        # energy计算
         energy = {}
         for i in range(self.width):
             for j in range(self.height):
@@ -16,22 +16,22 @@ class ResizeableImage(imagematrix.ImageMatrix):
         backpointer = {}
         for j in range(1, self.height):
             for i in range(self.width):
-                # Down
+                # 下
                 dp[i,j] = energy[i,j] + dp[i,j-1]
                 backpointer[i,j] = 0
-                # Down-left
+                # 左下
                 if i != 0:
                     if dp[i,j] > energy[i,j] + dp[i-1,j-1]:
                         dp[i,j] = energy[i,j] + dp[i-1,j-1]
                         backpointer[i,j] = -1
-                # Down-right
+                # 右下
                 if i != self.width-1:
                     if dp[i,j] > energy[i,j] + dp[i+1,j-1]:
                         dp[i,j] = energy[i,j] + dp[i+1,j-1]
                         backpointer[i,j] = 1
 
-        # Find best pixel in bottom row.
-        best_value = sys.maxint
+        # 答案
+        best_value = 0
         index = None
         for i in range(self.width):
             if dp[i,self.height-1] < best_value:

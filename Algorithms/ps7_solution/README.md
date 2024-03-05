@@ -7,4 +7,4 @@
   python test_resizeable_image.py
 
 ### 实现方式：
-  使用动态规划解决单点定位的子问题，单点的集合就是问题的解。
+  使用动态规划，递推式为： dp[i,j] = min(dp[i,j-1],dp[i-1,j-1],dp[i+1,j-1]) + energy(i,j), (i,j)为像素坐标
