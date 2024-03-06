@@ -29,10 +29,52 @@ def pack(tent_size, missing_squares, bag_list, max_vacancy):
         "anchor": (r, c) for upper-left corner of bag
         "shape": index of bag on bag list
     """
-    pass #TODO implementation
+    #base case: if a valid combination is found
+    if (tent_size[0]*tent_size[1])-len(missing_squares) <= max_vacancy:
+        return []
+    
+    coord = findEmpty(tent_size, missing_squares)
+    for b in range(len(bag_list)):
+        bags = [] 
+        occupied = missing_squares.copy()
+        
+        #add bag to tent if it fits
+        if doesFit(occupied, coord, bag_list[b], tent_size):
+            bags.append({'anchor':coord, 'shape':b})
+            for square in bag_list[b]:
+                occupied.add((coord[0]+square[0],coord[1]+square[1]))
+            response = pack(tent_size, occupied, bag_list, max_vacancy) #recursively call pack
+            if response != None:
+                return response+bags
+            
+    if max_vacancy > 0:        
+        occupied.add(coord)
+        response = pack(tent_size, occupied, bag_list, max_vacancy-1) #recursively call pack   
+        if response != None:
+            return response   
+    return None
+            
+def doesFit(occupied, anchor, bag, tent_size):
+    """ Determine if a bag fits in the tent. 'bag' is the shape, 'anchor'
+    is the coordinate of the top left corner of the bag. """
+    for coord0 in bag:
+        coord = (coord0[0]+anchor[0],coord0[1]+anchor[1])
+        if coord in occupied:
+            return False
+        elif coord[0] < 0 or coord[0] >= tent_size[0]:
+            return False
+        elif coord[1] < 0 or coord[1] >= tent_size[1]:
+            return False
+    return True
 
+def findEmpty(tent_size, missing_squares):#test the bag is placeing in valid coord 
+    for row in range(tent_size[0]):
+        for col in range(tent_size[1]):
+            if (row,col) not in missing_squares:
+                return (row,col)
+    return None
 
-
+        
 bag_list = [
     {(0, 0), (1, 0), (2, 0)},  # vertical 3x1 bag
     {(0, 0), (0, 1), (0, 2)},  # horizontal 1x3 bag

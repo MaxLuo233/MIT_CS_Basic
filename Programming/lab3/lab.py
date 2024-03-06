@@ -4,6 +4,31 @@ import sys
 sys.setrecursionlimit(10000)
 # NO ADDITIONAL IMPORTS
 
+def setValue(board, coords, value):
+    if len(coords) == 1:
+        board[coords[0]] = value
+    else:
+        setValue(board[coords[0]],coords[1:],value)
+
+def getValue(board, coords):
+    if len(coords) == 1:
+        return board[coords[0]]
+    return getValue(board[coords[0]],coords[1:])
+
+def possibleCoordinates(dimensions):
+    coordList = []
+    if len(dimensions) == 1:
+        for i in range(dimensions[0]):
+            coord = [i]
+            coordList.append(coord)
+        return coordList
+    
+    for i in range(dimensions[0]):
+        for coord0 in possibleCoordinates(dimensions[1:]):
+            coord = [i]+coord0
+            coordList.append(coord)
+    return coordList
+
 
 class HyperMinesGame:
     def __init__(self, dimensions, bombs):
@@ -17,7 +42,17 @@ class HyperMinesGame:
            bombs (list): Bomb locations as a list of lists, each an
                          N-dimensional coordinate
         """
-        raise NotImplementedError
+        self.dimensions = dimensions
+        self.state = 'ongoing' 
+        self.mask = self.make_board(dimensions,False)
+        self.board = self.make_board(dimensions,0)
+        self.allCoords = possibleCoordinates(self.dimensions)
+        for b in bombs:
+            self.set_coords(b,'.')
+            for neighbor in self.neighbors(b):
+                value = self.get_coords(neighbor)
+                if value != '.':
+                    self.set_coords(neighbor,value+1)
 
     def get_coords(self, coords):
         """Get the value of a square at the given coordinates on the board.
@@ -31,7 +66,7 @@ class HyperMinesGame:
         Returns:
             any: Value of the square
         """
-        raise NotImplementedError
+        return getValue(self.board,coords)
 
     def set_coords(self, coords, value):
         """Set the value of a square at the given coordinates on the board.
@@ -42,7 +77,7 @@ class HyperMinesGame:
         Args:
             coords (list): Coordinates of the square
         """
-        raise NotImplementedError
+        setValue(self.board,coords,value)
 
     def make_board(self, dimensions, elem):
         """Return a new game board
@@ -56,8 +91,10 @@ class HyperMinesGame:
         Returns:
             list: N-Dimensional board
         """
-        raise NotImplementedError # Remove this if you decide not to implement this method
-
+        if len(dimensions) == 1:
+            return [elem for x in range(dimensions[0])]
+        return [self.make_board(dimensions[1:],elem) for x in range(dimensions[0])]
+        
     def is_in_bounds(self, coords):
         """Return whether the coordinates are within bound
 
@@ -69,7 +106,10 @@ class HyperMinesGame:
         Returns:
             boolean: True if the coordinates are within bound and False otherwise
         """
-        raise NotImplementedError # Remove this if you decide not to implement this method
+        for c,d in zip(coords,self.dimensions):
+            if c < 0 or c >= d:
+                return False
+        return True
 
     def neighbors(self, coords):
         """Return a list of the neighbors of a square
@@ -82,9 +122,26 @@ class HyperMinesGame:
         Returns:
             list: coordinates of neighbors
         """
-        raise NotImplementedError # Remove this if you decide not to implement this method
-
-
+        neighborList = []
+        self.consNeighbors(coords,0,neighborList)
+        return neighborList
+    
+    def consNeighbors(self,coords,index,neighbors):
+        if index == len(coords)-1:
+            for dx in (-1,0,1):
+                coord = coords.copy()
+                coord[index] += dx
+                if self.is_in_bounds(coord):
+                    neighbors.append(coord)
+    
+        else:
+            for dx in (-1,0,1):
+                coord = coords.copy()
+                coord[index] += dx
+                self.consNeighbors(coord, index+1, neighbors)
+   
+        return neighbors
+        
     def is_victory(self):
         """Returns whether there is a victory in the game.
 
@@ -94,7 +151,14 @@ class HyperMinesGame:
         Returns:
             boolean: True if there is a victory and False otherwise
         """
-        raise NotImplementedError # Remove this if you decide not to implement this method
+        for coord in self.allCoords:
+            board = getValue(self.board,coord)
+            isDug = getValue(self.mask,coord)
+            if board == '.' and isDug:
+                return False
+            if board != '.' and not isDug:
+                return False
+        return True
 
     def dig(self, coords):
         """Recursively dig up square at coords and neighboring squares.
@@ -115,9 +179,27 @@ class HyperMinesGame:
         Returns:
            int: number of squares revealed
         """
-        raise NotImplementedError
-
-
+        #if defeated or already dug
+        if self.state != 'ongoing' or getValue(self.mask,coords):
+            return 0
+        
+        #if digging up a bomb
+        if getValue(self.board,coords) == '.':
+            setValue(self.mask,coords,True)
+            self.state = 'defeat'
+            return 1
+            
+        count = 1
+        setValue(self.mask,coords,True)
+        #if digging up a regular square, recursively dig its neighbors
+        if getValue(self.board,coords) == 0:
+            for neighbor in self.neighbors(coords):
+                count += self.dig(neighbor)
+           
+        if self.is_victory():
+            self.state = 'victory'
+        return count
+                
     def render(self, xray=False):
         """Prepare the game for display.
 
@@ -134,9 +216,20 @@ class HyperMinesGame:
         Returns:
            An n-dimensional array (nested lists)
         """
-        raise NotImplementedError
+        rendering = self.make_board(self.dimensions, None)
+        for coord in self.allCoords:
+            if xray or getValue(self.mask,coord):
+                if getValue(self.board,coord) == 0:
+                    setValue(rendering,coord,' ')
+                else:
+                    value = str(getValue(self.board,coord))
+                    setValue(rendering,coord,value)
+            else:
+                setValue(rendering,coord,'_')
+        return rendering
 
-    # ***Methods below this point are for testing and debugging purposes only. Do not modify anything here!***
+    # ***Methods below this point are for testing and debugging purposes only. 
+    #    Do not modify anything here!***
 
     def dump(self):
         """Print a human-readable representation of this game."""
@@ -154,3 +247,4 @@ class HyperMinesGame:
         for i in ('dimensions', 'board', 'state', 'mask'):
             setattr(game, i, d[i])
         return game
+    
