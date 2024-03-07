@@ -18,8 +18,10 @@ Homework and Labs of MIT CS Basic Courses
 递归与迭代，一致性原则，面向对象编程：Lab * 10
 
 ## 6.031 
+模块化、抽象接口设计、可靠性和可扩展性分析、一致性设计原则、分布式系统、网络、安全：
 
 ## 6.033
+
 
 ## 6.034
 Problem Set * 6
