@@ -17,8 +17,8 @@
 ### 实现细节：
   * 实例化多个接口
   * get_coords() - 返回单位属性
-  * set_coords() - 设置单位属性
-  * make_board(dimensions, elem) - 每次点击事件触发后维护游戏版面
+  * set_coords() - 设置单位属性，取消掉mask; 由于输入是坐标列表，该方法采用迭代处理列表
+  * make_board(dimensions, elem) - 根据维度和雷区分布初始化游戏版面
   * is_in_bounds(coords) - 判断是否触雷
   * neighbors(coords) - 返回周围雷区状态
   * is_victory() - 胜利条件判断

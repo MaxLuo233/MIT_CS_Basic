@@ -43,13 +43,13 @@ def pack(tent_size, missing_squares, bag_list, max_vacancy):
             bags.append({'anchor':coord, 'shape':b})
             for square in bag_list[b]:
                 occupied.add((coord[0]+square[0],coord[1]+square[1]))
-            response = pack(tent_size, occupied, bag_list, max_vacancy) #recursively call pack
+            response = pack(tent_size, occupied, bag_list, max_vacancy) #递归调用
             if response != None:
                 return response+bags
             
-    if max_vacancy > 0:        
+    if max_vacancy > 0:
         occupied.add(coord)
-        response = pack(tent_size, occupied, bag_list, max_vacancy-1) #recursively call pack   
+        response = pack(tent_size, occupied, bag_list, max_vacancy-1) #递归调用   
         if response != None:
             return response   
     return None
