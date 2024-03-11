@@ -14,4 +14,4 @@
   * 实例化pack(), 主方法
   * pack(tent_size, missing_squares, bag_list, max_vacancy) - 图大小、禁区坐标、密铺图形形状、最大空闲坐标数作为4个参数输入
   * pack是递归方法，遍历所有密铺形状，如果形状可以放下则改变missing_squares，进行重复调用（深度优先搜索）
-  * 由于有最大空闲坐标数作为限制，对于深度优先搜索出的方案还要进一步密铺,max_vacancy减一后继续迭代
+  * 如果放不下新的形状，则减少max_vacancy，对于

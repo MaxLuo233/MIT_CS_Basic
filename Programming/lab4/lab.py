@@ -29,7 +29,7 @@ def pack(tent_size, missing_squares, bag_list, max_vacancy):
         "anchor": (r, c) for upper-left corner of bag
         "shape": index of bag on bag list
     """
-    #base case: if a valid combination is found
+    #递归出口
     if (tent_size[0]*tent_size[1])-len(missing_squares) <= max_vacancy:
         return []
     
@@ -38,21 +38,23 @@ def pack(tent_size, missing_squares, bag_list, max_vacancy):
         bags = [] 
         occupied = missing_squares.copy()
         
-        #add bag to tent if it fits
+        #找到包
         if doesFit(occupied, coord, bag_list[b], tent_size):
             bags.append({'anchor':coord, 'shape':b})
             for square in bag_list[b]:
-                occupied.add((coord[0]+square[0],coord[1]+square[1]))
+                occupied.add((coord[0]+square[0], coord[1]+square[1]))
             response = pack(tent_size, occupied, bag_list, max_vacancy) #递归调用
             if response != None:
                 return response+bags
             
+    occupied = missing_squares.copy() #没有可放下的图形         
     if max_vacancy > 0:
         occupied.add(coord)
         response = pack(tent_size, occupied, bag_list, max_vacancy-1) #递归调用   
         if response != None:
             return response   
-    return None
+    
+    return None # max_vacancy=0但还有空位的情况
             
 def doesFit(occupied, anchor, bag, tent_size):
     """ Determine if a bag fits in the tent. 'bag' is the shape, 'anchor'
