@@ -242,14 +242,14 @@ def word_filter(trie, pattern, path=''):
     if len(pattern) == 0:
         if trie.value != None:
             result.append((path, trie.value))
-    else:    
-        if pattern[0] == '*':
-            result = result + word_filter(trie, pattern[1:], path)
+    else:     
         for l in trie.children:
-            if pattern[0] == '?' or pattern[0] == l:
+            if pattern[0] == '?' or l == pattern[0]:
                  result = result + word_filter(trie.children[l], pattern[1:], path+l)
             elif pattern[0] == '*':
                  result = result + word_filter(trie.children[l], pattern, path+l)
+        if pattern[0] == '*':
+            result = result + word_filter(trie, pattern[1:], path)
     return list(set(result))
 
 
