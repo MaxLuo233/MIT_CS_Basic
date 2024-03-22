@@ -6,7 +6,7 @@ Homework and Labs of MIT CS Basic Courses
 * 6.009 Programming
 * 6.031 Software Construction        
 * 6.033 Computer Systems          
-* 6.034 Artificial Intelligence and Machine Learning
+* 6.036 Machine Learning
 
 ## 6.004 
 组合逻辑，时序逻辑，汇编原理，计算机体系结构，微处理器，内存管理；WorkSheet不含代码项目
@@ -24,4 +24,4 @@ Homework and Labs of MIT CS Basic Courses
 操作系统、网络系统：Problem Set不含代码工程设计，由学习笔记替代
 
 ## 6.034
-基础统计知识、深度学习：Problem Set * 6
+回归、神经网络、CNN、RNN、聚类：hw和Lab关键模块不公开，下载官方Colab演示代码作为补充说明
