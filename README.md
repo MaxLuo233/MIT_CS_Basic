@@ -23,5 +23,5 @@ Homework and Labs of MIT CS Basic Courses
 ## 6.033
 操作系统、网络系统：Problem Set不含代码工程设计，由学习笔记替代
 
-## 6.034
-回归、神经网络、CNN、RNN、聚类：hw和Lab关键模块不公开，下载官方Colab演示代码作为补充说明
+## 6.036
+回归、神经网络、CNN、RNN、聚类：HW和Lab关键模块不公开，下载官方Colab演示代码作为补充说明
